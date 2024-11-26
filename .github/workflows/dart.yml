@@ -13,7 +13,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    
 
     steps:
     - name: Clone repository
@@ -21,7 +27,29 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: stable
-    - run: flutter pub get
-    - run: flutter test
-    - run: flutter build web --web-renderer canvaskit --no-web-resources-cdn
+        channel: master
+    - name: install Frog
+      run: dart pub global activate dart_frog_cli
+    - run: dart pub get
+    - name: 获取版本号
+      shell: pwsh
+      run: |
+        $version = (Get-Content pubspec.yaml -Raw) -match 'version:\s*([^\s]+)' | Out-Null
+        $version = $Matches[1] -replace '\+', '-'
+        echo "version=$version" | Out-File -Append -Encoding utf8 -FilePath $Env:GITHUB_ENV
+    - name: 打印版本号
+      run: |
+        echo "version: ${{ env.version }}"
+    - name: Build Project
+      run: dart_frog build
+    - name: zipped build
+      run: |
+         Compress-Archive -Path 'build' -DestinationPath 'Release.zip'
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "v${{ env.version }}"
+        draft: false
+        artifacts: "*.zip"
+        allowUpdates: true
+        token: ${{ github.token }}
