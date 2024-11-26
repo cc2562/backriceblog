@@ -24,6 +24,9 @@ backriceblog是riceblog的后端部分，采用dart+mysql架构，数据表结�
 - 完善用户管理部分
 
 
+Made with RICE
+
+
 
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license_link]: https://opensource.org/licenses/MIT
