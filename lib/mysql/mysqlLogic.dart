@@ -157,8 +157,8 @@ class Mysqllogic {
     return reslutList;
   }
 
-  GetLinks() async {
-    List reslutList = [];
+  Future<List<dynamic>> GetLinks() async {
+    List<dynamic> reslutList = [];
     final connected = await ConnectSql();
     await connected.connect();
     IResultSet result = await connected.execute(
